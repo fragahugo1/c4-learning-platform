@@ -6,10 +6,19 @@
     box-shadow: none !important;
 }
 
+::ng-deep .p-drawer-content {
+    overflow: visible !important;
+}
+
+::ng-deep .p-drawer {
+    border: none !important;
+    box-shadow: none !important;
+}
+
 .drawer-toggle {
-    position: absolute;
+    position: fixed;
     top: 50%;
-    right: -40px; 
+    left: 0;
     transform: translateY(-50%);
     
     width: 40px;
@@ -18,23 +27,21 @@
     border: none;
     border-radius: 0 10px 10px 0;
     cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+
+    z-index: 2001;
+
+    transition: left 0.3s ease;
 }
 
-.drawer-toggle.closed {
-    position: fixed;
-    left: 0; 
-    right: auto;
+.drawer-toggle.opened {
+    left: 300px;
 }
 
-::ng-deep .p-drawer-content {
-    overflow: visible !important;
-}
-
-::ng-deep .p-drawer {
-    box-shadow: none !important;
-    border: none !important;
+.drawer-toggle i {
+    font-size: 1.2rem;
+    color: #4b4b4b;
 }
