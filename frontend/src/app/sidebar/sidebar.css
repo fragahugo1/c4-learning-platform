@@ -1,10 +1,40 @@
 ::ng-deep .custom-sidebar {
-    background: #d9d9d9 !important; 
-    color: #333 !important;
-    width: 300px !important; 
+    background: #d9d9d9 !important;
+    width: 300px !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.drawer-toggle {
+    position: absolute;
+    top: 50%;
+    right: -40px; 
+    transform: translateY(-50%);
+    
+    width: 40px;
+    height: 60px;
+    background: #d9d9d9;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.drawer-toggle.closed {
+    position: fixed;
+    left: 0; 
+    right: auto;
+}
+
+::ng-deep .p-drawer-content {
+    overflow: visible !important;
 }
 
 ::ng-deep .p-drawer {
-    background: #a0a0a0 !important;
-    opacity: 1 !important;
+    box-shadow: none !important;
+    border: none !important;
 }

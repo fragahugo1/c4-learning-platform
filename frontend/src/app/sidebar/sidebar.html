@@ -1,19 +1,28 @@
+<button class="drawer-toggle" 
+        [class.opened]="sidebarVisible" 
+        (click)="sidebarVisible = !sidebarVisible">
+    <i [class]="sidebarVisible ? 'pi pi-chevron-left' : 'pi pi-chevron-right'"></i>
+</button>
 <p-drawer 
     [(visible)]="sidebarVisible"
     [modal]="false"
+    [showCloseIcon]="false"
     styleClass="custom-sidebar"
 >
+    <button class="drawer-toggle" (click)="sidebarVisible = false">
+        <i class="pi pi-chevron-left"></i>
+    </button>
     <div class="sidebar-header">
         <h3>Formas prontas</h3>
-        </div>
+    </div>
     <hr>
     <div class="sidebar-body">
         <h3>Mini mundo</h3>
-        </div>
+    </div>
 </p-drawer>
 
-<p-button 
-    (click)="sidebarVisible = true" 
-    icon="pi pi-bars" 
-    label="Menu">
-</p-button>
+@if (!sidebarVisible) {
+    <button class="drawer-toggle closed" (click)="sidebarVisible = true">
+        <i class="pi pi-chevron-right"></i>
+    </button>
+}
