@@ -1,6 +1,15 @@
-<p-drawer [(visible)]="sidebarVisible">
-    <h3>C4 Learning Platform</h3>
-    <p>Navegação do sistema aqui.</p>
+<p-drawer 
+    [(visible)]="sidebarVisible" 
+    (onHide)="sidebarVisible = false"
+    styleClass="custom-sidebar"
+>
+    <div class="sidebar-header">
+        <h3>Formas prontas</h3>
+        </div>
+    <hr>
+    <div class="sidebar-body">
+        <h3>Mini mundo</h3>
+        </div>
 </p-drawer>
 
 <p-button (click)="sidebarVisible = true" icon="pi pi-bars" label="Menu"></p-button>
