@@ -1,6 +1,6 @@
 <p-drawer 
-    [(visible)]="sidebarVisible" 
-    (onHide)="sidebarVisible = false"
+    [(visible)]="sidebarVisible"
+    [modal]="false"
     styleClass="custom-sidebar"
 >
     <div class="sidebar-header">
@@ -12,4 +12,8 @@
         </div>
 </p-drawer>
 
-<p-button (click)="sidebarVisible = true" icon="pi pi-bars" label="Menu"></p-button>
+<p-button 
+    (click)="sidebarVisible = true" 
+    icon="pi pi-bars" 
+    label="Menu">
+</p-button>
