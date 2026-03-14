@@ -1,0 +1,51 @@
+::ng-deep .custom-sidebar {
+    background: #d9d9d9 !important;
+    width: 300px !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+::ng-deep .p-drawer-content {
+    overflow: visible !important;
+}
+
+::ng-deep .p-drawer {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.drawer-toggle {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 60px;
+    background: #d9d9d9;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    z-index: 2001;
+    transition: left 0.3s cubic-bezier(0, 0, 0.2, 1);
+    overflow: visible; 
+}
+
+.drawer-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -20px; /* Estica 20px para "dentro" da sidebar */
+    width: 25px;
+    height: 100%;
+    background: #d9d9d9; /* Mesma cor exata */
+    z-index: -1; /* Fica atrás do ícone do botão */
+}
+
+.drawer-toggle.opened {
+    left: 300px;
+}
+
+.drawer-toggle i {
+    font-size: 1.2rem;
+    color: #4b4b4b;
+}
