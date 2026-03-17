@@ -1,0 +1,14 @@
+<div class="canvas-boundary">
+  @for (node of nodes; track node.id) {
+    <div class="diagram-node"
+         cdkDrag
+         [cdkDragFreeDragPosition]="{x: 0, y: 0}"
+         (cdkDragEnded)="onDragEnded($event, node)"
+         [style.left.px]="node.x"
+         [style.top.px]="node.y">
+      {{ node.text }}
+      
+      <div class="handle" cdkDragHandle>:::</div>
+    </div>
+  }
+</div>
