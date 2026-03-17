@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { Sidebar } from './sidebar/sidebar';
+import { BoardComponent } from './board/board';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DrawerModule, Sidebar],
+  imports: [DrawerModule, Sidebar, BoardComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
