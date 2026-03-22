@@ -15,7 +15,7 @@ export class HorizontalBar {
     { icon: 'pi pi-pencil', value: 'draw' },
     { icon: 'pi pi-comment', value: 'text' },
     { icon: 'pi pi-trash', value: 'layer' },
-    { icon: 'pi pi-palette', value: 'layer' }
+    { icon: 'pi pi-palette', value: 'paint' }
   ];
 
   selectTool(tool: any) {
