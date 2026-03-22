@@ -1,1 +1,9 @@
-<p>horizontal-bar works!</p>
+<div class="toolbar">
+  <button
+    *ngFor="let tool of tools"
+    (click)="selectTool(tool)"
+    [class.active]="tool.value === selectedTool"
+  >
+    <i [class]="tool.icon"></i>
+  </button>
+</div>
