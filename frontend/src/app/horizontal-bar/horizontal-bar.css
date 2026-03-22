@@ -4,10 +4,16 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 20px;
   background: #2c2c2c;
-  padding: 10px;
+  padding: 10px 15px;
   border-radius: 12px;
+}
+
+.tools {
+  display: flex;
+  gap: 10px;
 }
 
 button {
@@ -26,4 +32,16 @@ button.active {
 
 button:hover {
   background: #444;
+}
+
+.camada-btn {
+  width: auto;
+  padding: 0 15px;
+  background: #f4c542;
+  color: #000;
+  font-weight: bold;
+}
+
+.camada-btn:hover {
+  background: #e0b837;
 }

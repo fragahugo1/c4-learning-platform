@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class HorizontalBar {
   selectedTool = 'select';
+  camadaAtual = 1;
 
   tools = [
     { icon: 'pi pi-pencil', value: 'draw' },
@@ -20,5 +21,9 @@ export class HorizontalBar {
 
   selectTool(tool: any) {
     this.selectedTool = tool.value;
+  }
+
+  alternarCamada() {
+    this.camadaAtual = this.camadaAtual === 1 ? 2 : 1;
   }
 }
