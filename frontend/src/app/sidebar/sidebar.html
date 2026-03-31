@@ -12,14 +12,10 @@
     [showCloseIcon]="false"
     styleClass="custom-sidebar">
 
-    <div class="sidebar-header">
-        <h3>Formas prontas</h3>
-    </div>
-
-    <hr>
-
-    <div class="sidebar-body">
-        <h3>Mini mundo</h3>
+    <div class="sidebar-item" 
+        draggable="true" 
+        (dragstart)="onDragStart($event, 'Rectangle')">
+    Retângulo C4
     </div>
 
 </p-drawer>
