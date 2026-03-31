@@ -1,33 +1,43 @@
-.canvas-boundary {
-  width: 100%;
-  height: 800px;
-  position: relative; 
-  background-color: #ffffff;
-  background-image: radial-gradient(#d7d7d7 1px, transparent 1px);
-  background-size: 20px 20px; 
-  overflow: hidden;
-}
-
-.diagram-node {
-  width: 120px;
-  height: 60px;
-  position: absolute; 
-  background: white;
-  border: 2px solid #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
-  cursor: grab;
-  z-index: 10;
-}
-
-.handle {
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  display: block;
   position: absolute;
   top: 0;
   left: 0;
-  cursor: move;
-  padding: 2px;
-  background: #eee;
-  font-size: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+}
+
+::ng-deep .joint-paper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+::ng-deep .joint-port {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+::ng-deep .joint-cell:hover .joint-port {
+    opacity: 1;
+}
+
+::ng-deep .joint-port circle:hover {
+    fill: #ff5722;
+    r: 8;
+}
+
+::ng-deep .joint-tool-remove circle {
+    fill: #ff5252;
+}
+
+::ng-deep .joint-tool-remove path {
+    fill: white;
+}
+
+::ng-deep .joint-tool-options, 
+::ng-deep .joint-tool-vertices, 
+::ng-deep .joint-tool-segments {
+    display: none !important;
 }

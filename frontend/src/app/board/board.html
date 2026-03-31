@@ -1,13 +1,15 @@
-<div class="canvas-boundary">
+<div class="canvas-boundary" id="canvasList" cdkDropList 
+     [cdkDropListData]="nodes" (cdkDropListDropped)="drop($event)">
+     
   @for (node of nodes; track node.id) {
     <div class="diagram-node"
          cdkDrag
-         [cdkDragFreeDragPosition]="{x: 0, y: 0}"
+         [cdkDragFreeDragPosition]="{x: 0, y: 0}" 
          (cdkDragEnded)="onDragEnded($event, node)"
          [style.left.px]="node.x"
          [style.top.px]="node.y">
-      {{ node.text }}
       
+      {{ node.text || node.title }}
       <div class="handle" cdkDragHandle>:::</div>
     </div>
   }
