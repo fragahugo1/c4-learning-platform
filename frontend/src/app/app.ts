@@ -6,7 +6,7 @@ import { HorizontalBar } from './horizontal-bar/horizontal-bar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DrawerModule, Sidebar, HorizontalBar, BoardComponent],
+  imports: [DrawerModule, Sidebar, HorizontalBar, BoardComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
