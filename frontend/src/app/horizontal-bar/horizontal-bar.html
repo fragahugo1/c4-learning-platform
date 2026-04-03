@@ -1,0 +1,14 @@
+<div class="toolbar">
+  <div class="tools">
+    <button
+      *ngFor="let tool of tools"
+      (click)="selectTool(tool)"
+      [class.active]="tool.value === selectedTool"
+    >
+      <i [class]="tool.icon"></i>
+    </button>
+  </div>
+  <button class="camada-btn" (click)="alternarCamada()">
+    Camada {{ camadaAtual }}
+  </button>
+</div>

@@ -1,0 +1,47 @@
+.toolbar {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #2c2c2c;
+  padding: 10px 15px;
+  border-radius: 12px;
+}
+
+.tools {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button.active {
+  background: #18a0fb;
+}
+
+button:hover {
+  background: #444;
+}
+
+.camada-btn {
+  width: auto;
+  padding: 0 15px;
+  background: #f4c542;
+  color: #000;
+  font-weight: bold;
+}
+
+.camada-btn:hover {
+  background: #e0b837;
+}
