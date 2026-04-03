@@ -1,0 +1,43 @@
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+}
+
+::ng-deep .joint-paper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+::ng-deep .joint-port {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+::ng-deep .joint-cell:hover .joint-port {
+    opacity: 1;
+}
+
+::ng-deep .joint-port circle:hover {
+    fill: #ff5722;
+    r: 8;
+}
+
+::ng-deep .joint-tool-remove circle {
+    fill: #ff5252;
+}
+
+::ng-deep .joint-tool-remove path {
+    fill: white;
+}
+
+::ng-deep .joint-tool-options, 
+::ng-deep .joint-tool-vertices, 
+::ng-deep .joint-tool-segments {
+    display: none !important;
+}
