@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChild, OnDestroy, Input } from '@angular/core';
 import * as joint from 'jointjs';
 
 @Component({
@@ -9,6 +9,7 @@ import * as joint from 'jointjs';
 })
 export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
+  @Input() activeTool: string = 'draw';
 
   private graph = new joint.dia.Graph();
   private paper!: joint.dia.Paper;
@@ -45,6 +46,13 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           }
         }
       })
+    });
+
+    this.paper.on('element:pointerclick', (elementView: any) => {
+      if (this.activeTool === 'delete') {
+        elementView.model.remove();
+        return;
+      }
     });
 
     // Evento para mostrar o botão de remover (X) na seta
