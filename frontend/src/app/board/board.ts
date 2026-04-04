@@ -38,6 +38,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   private lastDiagramCoords = { x: 0, y: 0 };
   private graph = new joint.dia.Graph();
   private paper!: joint.dia.Paper;
+  private editingElement: joint.dia.Element | null = null;
 
   constructor(
     private ngZone: NgZone,
@@ -78,11 +79,36 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       })
     });
 
-    this.paper.on('element:pointerclick', (elementView: any) => {
+    this.paper.on('element:pointerdblclick', (elementView: any) => {
       if (this.activeTool === 'delete') {
         elementView.model.remove();
         return;
       }
+
+      const element = elementView.model;
+
+      this.ngZone.run(() => {
+        const bbox = elementView.getBBox();
+
+        const screenPoint = this.paper.localToClientPoint({
+          x: bbox.x,
+          y: bbox.y
+        });
+
+        this.textX = screenPoint.x + 10;
+        this.textY = screenPoint.y + 20;
+
+        this.textValue = element.attr('label/text') || '';
+        this.editingElement = element;
+        this.isEditingText = true;
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.textInput?.nativeElement.focus();
+          this.textInput?.nativeElement.select();
+        });
+      });
     });
 
     // Evento para mostrar o botão de remover (X) na seta
@@ -254,11 +280,31 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     textElement.addTo(this.graph);
   }
 
-  finishTextEditing() {
-    if (this.textValue.trim()) {
-      this.createPlainText(this.lastDiagramCoords.x, this.lastDiagramCoords.y, this.textValue);
+    finishTextEditing() {
+      const text = this.textValue.trim();
+
+      if (!text) {
+        this.cancelTextEditing();
+        return;
+      }
+
+      if (this.editingElement) {
+        this.editingElement.attr('label/text', text);
+      } 
+      else {
+        this.createPlainText(
+          this.lastDiagramCoords.x,
+          this.lastDiagramCoords.y,
+          text
+        );
+      }
+
+      this.cancelTextEditing();
     }
-    this.isEditingText = false;
-    this.textValue = '';
-  }
+
+    private cancelTextEditing() {
+      this.isEditingText = false;
+      this.textValue = '';
+      this.editingElement = null;
+    }
 }
