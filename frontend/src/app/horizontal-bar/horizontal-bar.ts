@@ -24,6 +24,12 @@ export class HorizontalBar {
   // Para adicionar uma funcionalidade em um dos botões, apenas substitua o console.log por uma chamada de método
   // Para atualizações, pode mudar o nome do case ou adicionar mais um case no switch
   selectTool(tool: any) {
+    if (this.selectedTool === tool.value) {
+      this.selectedTool = '';
+      this.toolChanged.emit('');
+      return;
+    }
+
     this.selectedTool = tool.value;
     this.toolChanged.emit(tool.value);
   }
