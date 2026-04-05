@@ -1,17 +1,49 @@
-import { Component, ElementRef, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, AfterViewInit, ViewChild, OnDestroy, Input, NgZone, ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import * as joint from 'jointjs';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  template: `<div #canvas class="canvas-container"></div>`,
-  styleUrls: ['./board.css']
+  template: `
+  <div class="board-wrapper">
+    <div #canvas class="canvas-container"></div>
+
+    <input
+      *ngIf="isEditingText"
+      #textInput
+      class="floating-text-input"
+      [style.left.px]="textX"
+      [style.top.px]="textY"
+      [(ngModel)]="textValue"
+      (blur)="finishTextEditing()"
+      (keydown.enter)="finishTextEditing()"
+      autofocus
+    />
+  </div>
+  `,
+  styleUrls: ['./board.css'],
+  imports: [CommonModule, FormsModule],
 })
 export class BoardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef;
+  @Input() activeTool: string = 'draw';
+  @ViewChild('textInput') textInput!: ElementRef;
+  isEditingText = false;
+  textX = 0;
+  textY = 0;
+  textValue = '';
 
+  private lastDiagramCoords = { x: 0, y: 0 };
   private graph = new joint.dia.Graph();
   private paper!: joint.dia.Paper;
+  private editingElement: joint.dia.Element | null = null;
+
+  constructor(
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngAfterViewInit() {
     const width = this.canvas.nativeElement.clientWidth || window.innerWidth;
@@ -47,6 +79,38 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       })
     });
 
+    this.paper.on('element:pointerdblclick', (elementView: any) => {
+      if (this.activeTool === 'delete') {
+        elementView.model.remove();
+        return;
+      }
+
+      const element = elementView.model;
+
+      this.ngZone.run(() => {
+        const bbox = elementView.getBBox();
+
+        const screenPoint = this.paper.localToClientPoint({
+          x: bbox.x,
+          y: bbox.y
+        });
+
+        this.textX = screenPoint.x + 10;
+        this.textY = screenPoint.y + 20;
+
+        this.textValue = element.attr('label/text') || '';
+        this.editingElement = element;
+        this.isEditingText = true;
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.textInput?.nativeElement.focus();
+          this.textInput?.nativeElement.select();
+        });
+      });
+    });
+
     // Evento para mostrar o botão de remover (X) na seta
     this.paper.on('link:pointerclick', (linkView) => {
       const removeButton = new joint.linkTools.Remove({
@@ -61,12 +125,27 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       linkView.addTools(toolsView);
     });
 
-    // Evento para esconder o botão de remover ao clicar no fundo branco
-    this.paper.on('blank:pointerclick', () => {
-      this.graph.getLinks().forEach(link => {
-        const view = this.paper.findViewByModel(link);
-        if (view) view.removeTools();
-      });
+    this.paper.on('blank:pointerclick', (_evt, x, y) => {
+      if (this.activeTool === 'text') {
+        this.ngZone.run(() => {
+          this.lastDiagramCoords = { x, y };
+
+          const localPoint = this.paper.localToClientPoint({ x, y });
+          this.textX = localPoint.x;
+          this.textY = localPoint.y;
+
+          this.textValue = '';
+          this.isEditingText = true;
+
+          this.cdr.detectChanges(); // força render AGORA
+
+          setTimeout(() => {
+            this.textInput?.nativeElement.focus();
+          });
+        });
+
+        return;
+      }
     });
 
     const rect1 = this.createBlock(50, 50, 'Início');
@@ -176,4 +255,56 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     window.removeEventListener('resize', this.onResize);
   }
+
+  createPlainText(x: number, y: number, text: string) {
+    const textElement = new joint.shapes.standard.Rectangle();
+
+    textElement.position(x, y);
+    textElement.resize(200, 40);
+
+    textElement.attr({
+      body: {
+        fill: 'transparent',
+        stroke: 'transparent'
+      },
+      label: {
+        text,
+        fontSize: 18,
+        fill: '#222',
+        textAnchor: 'start',
+        textVerticalAnchor: 'middle',
+        refX: 0
+      }
+    });
+
+    textElement.addTo(this.graph);
+  }
+
+    finishTextEditing() {
+      const text = this.textValue.trim();
+
+      if (!text) {
+        this.cancelTextEditing();
+        return;
+      }
+
+      if (this.editingElement) {
+        this.editingElement.attr('label/text', text);
+      } 
+      else {
+        this.createPlainText(
+          this.lastDiagramCoords.x,
+          this.lastDiagramCoords.y,
+          text
+        );
+      }
+
+      this.cancelTextEditing();
+    }
+
+    private cancelTextEditing() {
+      this.isEditingText = false;
+      this.textValue = '';
+      this.editingElement = null;
+    }
 }

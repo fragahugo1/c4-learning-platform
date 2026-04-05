@@ -1,6 +1,11 @@
 <div style="display: flex;">
   <app-sidebar></app-sidebar>
-  <app-board style="flex-grow: 1;"></app-board>
+  <app-board
+    style="flex-grow: 1;"
+    [activeTool]="activeTool">
+  </app-board>
 </div>
 
-<app-horizontal-bar></app-horizontal-bar>
+<app-horizontal-bar
+  (toolChanged)="activeTool = $event">
+</app-horizontal-bar>
