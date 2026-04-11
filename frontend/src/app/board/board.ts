@@ -65,6 +65,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       validateMagnet: (cellView, magnet) => {
         return magnet && magnet.getAttribute('magnet') !== 'false';
       },
+      validateConnection: (sourceView, sourceMagnet, targetView, targetMagnet) => {
+        if (!targetMagnet) return false;
+        return targetMagnet.getAttribute('magnet') !== 'false';
+      },
       defaultLink: () => new joint.shapes.standard.Link({
         attrs: {
           line: {
@@ -456,7 +460,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     createBoundary(x: number, y: number, text: string) {
       const boundary = new joint.shapes.standard.Rectangle();
 
-      boundary.resize(400, 250);
+      boundary.resize(900, 700);
       boundary.position(x, y);
 
       boundary.attr({
@@ -464,7 +468,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
           fill: 'transparent',
           stroke: '#616161',
           strokeWidth: 2,
-          strokeDasharray: '10 5'
+          strokeDasharray: '10 5',
+          magnet: false
         },
         label: {
           text: '🧱 ' + text,
