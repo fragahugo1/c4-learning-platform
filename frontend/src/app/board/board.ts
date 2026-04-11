@@ -36,7 +36,20 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
   textValue = '';
 
   private lastDiagramCoords = { x: 0, y: 0 };
-  private graph = new joint.dia.Graph();
+  private graph = new joint.dia.Graph({}, {
+    cellNamespace: {
+      c4: {
+        Person: joint.shapes.standard.Rectangle,
+        System: joint.shapes.standard.Rectangle,
+        Container: joint.shapes.standard.Rectangle,
+        Database: joint.shapes.standard.Cylinder,
+        Component: joint.shapes.standard.Rectangle,
+        Boundary: joint.shapes.standard.Rectangle,
+        PlainText: joint.shapes.standard.Rectangle
+      },
+      standard: joint.shapes.standard
+    }
+  });
   private paper!: joint.dia.Paper;
   private editingElement: joint.dia.Element | null = null;
 
@@ -82,6 +95,15 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
         }
       })
     });
+
+    setTimeout(() => {
+      this.loadFromLocalStorage();
+      setTimeout(() => {
+        (this.graph as any).on('add remove change', () => {
+          this.saveToLocalStorage();
+        });
+      }, 500);
+    }, 200);
 
     this.paper.on('element:pointerdblclick', (elementView: any) => {
       if (this.activeTool === 'delete') {
@@ -336,6 +358,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createPerson(x: number, y: number, text: string) {
       const person = new joint.shapes.standard.Rectangle();
+      person.prop('type', 'c4.Person');
 
       person.resize(120, 60);
       person.position(x, y);
@@ -363,6 +386,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createSystem(x: number, y: number, text: string) {
       const system = new joint.shapes.standard.Rectangle();
+      system.prop('type', 'c4.System');
 
       system.resize(180, 80);
       system.position(x, y);
@@ -388,6 +412,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createContainer(x: number, y: number, text: string) {
       const container = new joint.shapes.standard.Rectangle();
+      container.prop('type', 'c4.Container');
 
       container.resize(160, 70);
       container.position(x, y);
@@ -412,6 +437,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createDatabase(x: number, y: number, text: string) {
       const db = new joint.shapes.standard.Cylinder();
+      db.prop('type', 'c4.Database');
 
       db.resize(120, 80);
       db.position(x, y);
@@ -436,6 +462,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createComponent(x: number, y: number, text: string) {
       const comp = new joint.shapes.standard.Rectangle();
+      comp.prop('type', 'c4.Component');
 
       comp.resize(140, 60);
       comp.position(x, y);
@@ -459,6 +486,7 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
 
     createBoundary(x: number, y: number, text: string) {
       const boundary = new joint.shapes.standard.Rectangle();
+      boundary.prop('type', 'c4.Boundary');
 
       boundary.resize(900, 700);
       boundary.position(x, y);
@@ -506,4 +534,22 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
         ]
       });
     }
+
+    private saveToLocalStorage() {
+      const data = this.graph.toJSON();
+      localStorage.setItem('c4-diagram-data', JSON.stringify(data));
+    }
+
+    private loadFromLocalStorage() {
+      const savedData = localStorage.getItem('c4-diagram-data');
+      if (savedData) {
+        try {
+          const json = JSON.parse(savedData);
+          this.graph.fromJSON(json);
+        } catch (e) {
+          console.error('Erro ao carregar:', e);
+        }
+      }
+    }
+
 }
