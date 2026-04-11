@@ -65,6 +65,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       validateMagnet: (cellView, magnet) => {
         return magnet && magnet.getAttribute('magnet') !== 'false';
       },
+      validateConnection: (sourceView, sourceMagnet, targetView, targetMagnet) => {
+        if (!targetMagnet) return false;
+        return targetMagnet.getAttribute('magnet') !== 'false';
+      },
       defaultLink: () => new joint.shapes.standard.Link({
         attrs: {
           line: {
@@ -148,10 +152,6 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       }
     });
 
-    const rect1 = this.createBlock(50, 50, 'Início');
-    const rect2 = this.createBlock(250, 150, 'Processo');
-    this.createLink(rect1, rect2);
-
     this.setupDropListeners();
     window.addEventListener('resize', this.onResize);
     setTimeout(() => this.onResize(), 100);
@@ -163,7 +163,8 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
     el.addEventListener('drop', (event: DragEvent) => {
       event.preventDefault();
       const type = event.dataTransfer?.getData('type');
-      
+      if (!type) return;
+
       const mouseX = event.offsetX;
       const mouseY = event.offsetY;
       const blockWidth = 120;
@@ -175,12 +176,12 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       const safeX = Math.max(0, Math.min(mouseX, maxX));
       const safeY = Math.max(0, Math.min(mouseY, maxY));
 
-      if (type === 'Rectangle') {
-        this.createBlock(safeX, safeY, 'Novo Bloco');
-      }
+      this.createC4Element(type, safeX, safeY);
     });
 
-    el.addEventListener('dragover', (event: DragEvent) => event.preventDefault());
+    el.addEventListener('dragover', (event: DragEvent) => {
+      event.preventDefault();
+    });
   }
 
   private onResize = () => {
@@ -306,5 +307,203 @@ export class BoardComponent implements AfterViewInit, OnDestroy {
       this.isEditingText = false;
       this.textValue = '';
       this.editingElement = null;
+    }
+
+    createC4Element(type: string, x: number, y: number) {
+      switch (type) {
+        case 'person':
+          return this.createPerson(x, y, 'Usuário');
+
+        case 'system':
+          return this.createSystem(x, y, 'Sistema');
+
+        case 'container':
+          return this.createContainer(x, y, 'Web App');
+
+        case 'database':
+          return this.createDatabase(x, y, 'PostgreSQL');
+
+        case 'component':
+          return this.createComponent(x, y, 'Auth Service');
+
+        case 'boundary':
+          return this.createBoundary(x, y, 'Sistema');
+
+        default:
+          return this.createBlock(x, y, 'Novo Bloco');
+      }
+    }
+
+    createPerson(x: number, y: number, text: string) {
+      const person = new joint.shapes.standard.Rectangle();
+
+      person.resize(120, 60);
+      person.position(x, y);
+
+      person.attr({
+        body: {
+          fill: '#e3f2fd',
+          stroke: '#1976d2',
+          strokeWidth: 2,
+          rx: 30,
+          ry: 30
+        },
+        label: {
+          text: '👤 ' + text,
+          fontSize: 14,
+          fontWeight: 'bold'
+        }
+      });
+
+      this.addPorts(person);
+
+      person.addTo(this.graph);
+      return person;
+    }
+
+    createSystem(x: number, y: number, text: string) {
+      const system = new joint.shapes.standard.Rectangle();
+
+      system.resize(180, 80);
+      system.position(x, y);
+
+      system.attr({
+        body: {
+          fill: '#fff3e0',
+          stroke: '#f57c00',
+          strokeWidth: 3
+        },
+        label: {
+          text: '🖥️ ' + text,
+          fontSize: 15,
+          fontWeight: 'bold'
+        }
+      });
+
+      this.addPorts(system);
+
+      system.addTo(this.graph);
+      return system;
+    }
+
+    createContainer(x: number, y: number, text: string) {
+      const container = new joint.shapes.standard.Rectangle();
+
+      container.resize(160, 70);
+      container.position(x, y);
+
+      container.attr({
+        body: {
+          fill: '#ede7f6',
+          stroke: '#5e35b1',
+          strokeWidth: 2
+        },
+        label: {
+          text: '📦 ' + text,
+          fontSize: 14
+        }
+      });
+
+      this.addPorts(container);
+
+      container.addTo(this.graph);
+      return container;
+    }
+
+    createDatabase(x: number, y: number, text: string) {
+      const db = new joint.shapes.standard.Cylinder();
+
+      db.resize(120, 80);
+      db.position(x, y);
+
+      db.attr({
+        body: {
+          fill: '#e8f5e9',
+          stroke: '#2e7d32',
+          strokeWidth: 2
+        },
+        label: {
+          text: '🛢️ ' + text,
+          fontSize: 14
+        }
+      });
+
+      this.addPorts(db);
+
+      db.addTo(this.graph);
+      return db;
+    }
+
+    createComponent(x: number, y: number, text: string) {
+      const comp = new joint.shapes.standard.Rectangle();
+
+      comp.resize(140, 60);
+      comp.position(x, y);
+
+      comp.attr({
+        body: {
+          fill: '#fce4ec',
+          stroke: '#c2185b',
+          strokeDasharray: '5 2'
+        },
+        label: {
+          text: '🧩 ' + text
+        }
+      });
+
+      this.addPorts(comp);
+
+      comp.addTo(this.graph);
+      return comp;
+    }
+
+    createBoundary(x: number, y: number, text: string) {
+      const boundary = new joint.shapes.standard.Rectangle();
+
+      boundary.resize(900, 700);
+      boundary.position(x, y);
+
+      boundary.attr({
+        body: {
+          fill: 'transparent',
+          stroke: '#616161',
+          strokeWidth: 2,
+          strokeDasharray: '10 5',
+          magnet: false
+        },
+        label: {
+          text: '🧱 ' + text,
+          refY: 10
+        }
+      });
+
+      boundary.addTo(this.graph);
+      return boundary;
+    }
+
+    private addPorts(element: joint.dia.Element) {
+      const portGroup = {
+        position: { name: 'absolute' },
+        attrs: {
+          circle: {
+            r: 6,
+            magnet: true,
+            fill: '#2196f3',
+            stroke: '#fff',
+            strokeWidth: 2,
+            cursor: 'crosshair'
+          }
+        }
+      };
+
+      element.prop('ports', {
+        groups: { out: portGroup },
+        items: [
+          { group: 'out', args: { x: '50%', y: 0 }, id: 'top' },
+          { group: 'out', args: { x: '50%', y: '100%' }, id: 'bottom' },
+          { group: 'out', args: { x: 0, y: '50%' }, id: 'left' },
+          { group: 'out', args: { x: '100%', y: '50%' }, id: 'right' }
+        ]
+      });
     }
 }

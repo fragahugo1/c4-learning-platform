@@ -12,10 +12,33 @@
     [showCloseIcon]="false"
     styleClass="custom-sidebar">
 
-    <div class="sidebar-item" 
-        draggable="true" 
-        (dragstart)="onDragStart($event, 'Rectangle')">
-    Retângulo C4
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'person')">
+        👤 Pessoa
     </div>
 
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'system')">
+        🖥️ Sistema
+    </div>
+
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'container')">
+        📦 Container
+    </div>
+
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'database')">
+        🛢️ Banco de Dados
+    </div>
+
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'component')">
+        🧩 Componente
+    </div>
+
+    <div class="sidebar-item" draggable="true"
+        (dragstart)="onDragStart($event, 'boundary')">
+        🧱 Boundary
+    </div>
 </p-drawer>
