@@ -14,4 +14,5 @@ import { HorizontalBar } from './horizontal-bar/horizontal-bar';
 export class App {
   activeTool = 'draw';
   protected readonly title = signal('frontend');
+  currentLayer = 1;
 }
