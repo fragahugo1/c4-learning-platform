@@ -2,10 +2,12 @@
   <app-sidebar></app-sidebar>
   <app-board
     style="flex-grow: 1;"
-    [activeTool]="activeTool">
+    [activeTool]="activeTool"
+    [currentLayer]="currentLayer">
   </app-board>
 </div>
 
 <app-horizontal-bar
-  (toolChanged)="activeTool = $event">
+  (toolChanged)="activeTool = $event"
+  (layerChanged)="currentLayer = $event">
 </app-horizontal-bar>

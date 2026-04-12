@@ -12,6 +12,7 @@ export class HorizontalBar {
   selectedTool = 'select';
   camadaAtual = 1;
   @Output() toolChanged = new EventEmitter<string>();
+  @Output() layerChanged = new EventEmitter<number>();
 
   tools = [
     { icon: 'pi pi-pencil', value: 'draw' },
@@ -33,6 +34,6 @@ export class HorizontalBar {
 
   alternarCamada() {
     this.camadaAtual = this.camadaAtual === 1 ? 2 : 1;
-    console.log("Trocando de camada!");
+    this.layerChanged.emit(this.camadaAtual);
   }
 }
