@@ -1,13 +1,13 @@
 <div style="display: flex;">
-  <app-sidebar></app-sidebar>
+  <app-sidebar [currentLayer]="currentLayer()"></app-sidebar>
   <app-board
     style="flex-grow: 1;"
     [activeTool]="activeTool"
-    [currentLayer]="currentLayer">
+    [currentLayer]="currentLayer()">
   </app-board>
 </div>
 
 <app-horizontal-bar
   (toolChanged)="activeTool = $event"
-  (layerChanged)="currentLayer = $event">
+  (layerChanged)="onLayerChanged($event)">
 </app-horizontal-bar>
