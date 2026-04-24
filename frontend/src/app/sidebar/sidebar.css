@@ -3,10 +3,15 @@
     width: 300px !important;
     border: none !important;
     box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
 }
 
 ::ng-deep .p-drawer-content {
     overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 ::ng-deep .p-drawer {
@@ -50,6 +55,12 @@
     color: #4b4b4b;
 }
 
+.sidebar-items-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
 .sidebar-item {
   padding: 10px;
   border: 1px solid #ddd;
@@ -57,6 +68,11 @@
   background: white;
   cursor: grab;
   transition: transform 0.2s;
+  margin: 5px;
+}
+
+.sidebar-item:hover {
+  background: #f5f5f5;
 }
 
 .cdk-drag-placeholder {
@@ -68,4 +84,39 @@
   border: 2px solid #2196f3;
   padding: 10px;
   border-radius: 4px;
+}
+
+.phase-guide {
+    border-top: 2px solid #999;
+    padding: 15px 10px;
+    background: #f0f0f0;
+    margin-top: auto;
+    flex-shrink: 0;
+    max-height: 40%;
+    overflow-y: auto;
+}
+
+.phase-section {
+    margin-bottom: 15px;
+}
+
+.phase-section:last-child {
+    margin-bottom: 0;
+}
+
+.phase-title {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.phase-text {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #555;
+    font-style: italic;
 }

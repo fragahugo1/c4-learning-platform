@@ -12,33 +12,48 @@
     [showCloseIcon]="false"
     styleClass="custom-sidebar">
 
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'person')">
-        👤 Pessoa
+    <div class="sidebar-items-container">
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'person')">
+            👤 Pessoa
+        </div>
+
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'system')">
+            🖥️ Sistema
+        </div>
+
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'container')">
+            📦 Container
+        </div>
+
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'database')">
+            🛢️ Banco de Dados
+        </div>
+
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'component')">
+            🧩 Componente
+        </div>
+
+        <div class="sidebar-item" draggable="true"
+            (dragstart)="onDragStart($event, 'boundary')">
+            🧱 Boundary
+        </div>
     </div>
 
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'system')">
-        🖥️ Sistema
+    <div class="phase-guide" *ngIf="currentPhase()">
+        <div class="phase-section">
+            <h3 class="phase-title">📖 Cenário</h3>
+            <p class="phase-text">{{ currentPhase()!.contexto }}</p>
+        </div>
+
+        <div class="phase-section">
+            <h3 class="phase-title">🎯 Foco da Camada {{ currentLayer() }}</h3>
+            <p class="phase-text">{{ currentPhase()!.instrucao }}</p>
+        </div>
     </div>
 
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'container')">
-        📦 Container
-    </div>
-
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'database')">
-        🛢️ Banco de Dados
-    </div>
-
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'component')">
-        🧩 Componente
-    </div>
-
-    <div class="sidebar-item" draggable="true"
-        (dragstart)="onDragStart($event, 'boundary')">
-        🧱 Boundary
-    </div>
 </p-drawer>
