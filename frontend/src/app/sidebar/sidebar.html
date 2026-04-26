@@ -54,6 +54,12 @@
             <h3 class="phase-title">🎯 Foco da Camada {{ currentLayer() }}</h3>
             <p class="phase-text">{{ currentPhase()!.instrucao }}</p>
         </div>
+
+        <div class="phase-section" style="margin-top: 15px;">
+            <button class="btn-validate" (click)="startEvaluation()">
+                <i class="pi pi-sparkles"></i> Iniciar Avaliação
+            </button>
+        </div>
     </div>
 
 </p-drawer>
