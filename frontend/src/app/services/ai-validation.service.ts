@@ -3,29 +3,48 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AiValidationService {
-  private apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-  private apiKey = 'CHAVE'; 
+  private apiUrl = 'http://localhost:11434/api/chat';
 
   constructor(private http: HttpClient) {}
 
   validar(json: string, contexto: string, instrucao: string) {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    });
-
     const body = {
-      model: 'llama3-8b-8192',
+      model: 'llama3',
       messages: [
         {
           role: 'system',
-          content: `Você é um professor de C4 Model. Avalie o diagrama JSON. Cenário: ${contexto}. Instrução: ${instrucao}. Responda em JSON: {"score": 0-100, "dicas": ["..."]}`
+          content: `
+            Você é um avaliador EXTREMAMENTE rigoroso de diagramas C4.
+
+            REGRAS:
+            - Responda APENAS em JSON válido
+            - NÃO escreva nada fora do JSON
+
+            FORMATO:
+            {
+              "score": number,
+              "dicas": string[]
+            }
+
+            CRITÉRIOS INTERNOS (NÃO REPETIR):
+            - Diagrama vazio ou com 1 elemento → score 0-20
+            - Faltam atores principais → score máximo 30
+            - Sem interações → score máximo 40
+
+            IMPORTANTE:
+            - NÃO repita os critérios nas dicas
+            - As dicas devem ser específicas para o diagrama enviado
+            - As dicas devem explicar o que falta ou o que melhorar
+
+            Cenário: ${contexto}
+            Instrução: ${instrucao}
+            `
         },
         { role: 'user', content: json }
       ],
-      response_format: { type: 'json_object' }
+      stream: false
     };
 
-    return this.http.post(this.apiUrl, body, { headers });
+    return this.http.post(this.apiUrl, body);
   }
 }
