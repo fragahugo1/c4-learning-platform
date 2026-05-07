@@ -2,11 +2,12 @@
   width: 100vw;
   height: 100vh;
   display: block;
-  position: absolute;
+  position: relative; 
   top: 0;
   left: 0;
   background-color: #f8f9fa;
   border: 1px solid #ddd;
+  z-index: 1;
 }
 
 ::ng-deep .joint-paper {
@@ -75,4 +76,19 @@
   font-family: sans-serif;
   min-width: 100px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.canvas-container {
+  position: relative;
+  z-index: 1;
+}
+
+::ng-deep .joint-paper > svg {
+  pointer-events: none;
+}
+
+::ng-deep .joint-paper .joint-cells-layer,
+::ng-deep .joint-paper .joint-tools-layer,
+::ng-deep .joint-paper .joint-back-layer {
+  pointer-events: all;
 }

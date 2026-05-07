@@ -36,6 +36,9 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
   textY = 0;
   textValue = '';
   private isSwitchingLayer = false;
+  private isDrawing = false;
+  private currentPath: SVGPathElement | null = null;
+  private pathData = '';
 
   private lastDiagramCoords = { x: 0, y: 0 };
   private graph = new joint.dia.Graph({}, {
@@ -180,6 +183,92 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.setupDropListeners();
     window.addEventListener('resize', this.onResize);
     setTimeout(() => this.onResize(), 100);
+
+    const svg = this.canvas.nativeElement.querySelector('svg');
+
+    this.paper.on('blank:pointerdown', (_evt, x, y) => {
+      if (this.activeTool !== 'draw') return;
+
+      this.isDrawing = true;
+
+      this.pathData = `M ${x} ${y}`;
+
+      this.currentPath = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'path'
+      );
+
+      this.currentPath.setAttribute('d', this.pathData);
+      this.currentPath.setAttribute('fill', 'none');
+      this.currentPath.setAttribute('stroke', '#000');
+      this.currentPath.setAttribute('stroke-width', '2');
+      this.currentPath.setAttribute('stroke-linecap', 'round');
+      this.currentPath.setAttribute('stroke-linejoin', 'round');
+
+      svg.appendChild(this.currentPath);
+    });
+
+    let lastX = 0;
+    let lastY = 0;
+
+    this.paper.on('blank:pointerdown', (_evt, x, y) => {
+      if (this.activeTool !== 'draw') return;
+
+      this.isDrawing = true;
+
+      lastX = x;
+      lastY = y;
+
+      this.pathData = `M ${x} ${y}`;
+
+      this.currentPath = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'path'
+      );
+
+      this.currentPath.setAttribute('d', this.pathData);
+      this.currentPath.setAttribute('fill', 'none');
+      this.currentPath.setAttribute('stroke', '#000');
+      this.currentPath.setAttribute('stroke-width', '2');
+      this.currentPath.setAttribute('stroke-linecap', 'round');
+      this.currentPath.setAttribute('stroke-linejoin', 'round');
+
+      svg.appendChild(this.currentPath);
+    });
+
+    this.canvas.nativeElement.addEventListener(
+      'pointermove',
+      (evt: PointerEvent) => {
+        if (!this.isDrawing || !this.currentPath) return;
+
+        const rect = this.canvas.nativeElement.getBoundingClientRect();
+
+        const point = this.paper.clientToLocalPoint({
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        });
+
+        const midX = (lastX + point.x) / 2;
+        const midY = (lastY + point.y) / 2;
+
+        this.pathData += ` Q ${lastX} ${lastY} ${midX} ${midY}`;
+
+        this.currentPath.setAttribute('d', this.pathData);
+
+        lastX = point.x;
+        lastY = point.y;
+      }
+    );
+
+    window.addEventListener('pointerup', () => {
+      this.isDrawing = false;
+      this.currentPath = null;
+    });
+
+    this.paper.on('blank:pointerup', () => {
+      this.isDrawing = false;
+      this.currentPath = null;
+    });
   }
 
   private setupDropListeners() {
