@@ -782,14 +782,19 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     }[] = [];
 
     private enablePathDeletion(path: SVGPathElement, id: string) {
-    path.addEventListener('click', () => {
-      if (this.activeTool !== 'delete') return;
+    path.style.pointerEvents = 'auto';
+    path.style.cursor = 'pointer';
+    path.addEventListener('pointerdown', (event) => {
+        if (this.activeTool !== 'delete') return;
+        event.stopPropagation();
 
-      path.remove();
+        path.remove();
 
-      this.drawings = this.drawings.filter(d => d.id !== id);
+        this.drawings = this.drawings.filter(
+          d => d.id !== id
+        );
 
-      this.saveToLocalStorage();
-    });
-  }
+        this.saveToLocalStorage();
+      });
+    }
 }
