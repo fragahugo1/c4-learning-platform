@@ -261,6 +261,22 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     );
 
     window.addEventListener('pointerup', () => {
+      if (this.isDrawing && this.currentPath) {
+
+        const id = crypto.randomUUID();
+
+        this.currentPath.setAttribute('data-id', id);
+
+        this.drawings.push({
+          id,
+          path: this.pathData
+        });
+
+        this.enablePathDeletion(this.currentPath, id);
+
+        this.saveToLocalStorage();
+      }
+
       this.isDrawing = false;
       this.currentPath = null;
     });
@@ -639,7 +655,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     private saveToLocalStorage() {
-      const data = this.graph.toJSON();
+      const data = {
+        graph: this.graph.toJSON(),
+        drawings: this.drawings
+      };
       localStorage.setItem(
         `c4-diagram-layer-${this.currentLayer}`,
         JSON.stringify(data)
@@ -653,7 +672,33 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       if (savedData) {
         try {
           const json = JSON.parse(savedData);
-          this.graph.fromJSON(json);
+          this.graph.fromJSON(json.graph || json);
+          if (json.drawings) {
+
+            const svg = this.canvas.nativeElement.querySelector('svg');
+
+            this.drawings = json.drawings;
+
+            this.drawings.forEach((drawing: any) => {
+
+              const path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+              );
+
+              path.setAttribute('d', drawing.path);
+              path.setAttribute('fill', 'none');
+              path.setAttribute('stroke', '#000');
+              path.setAttribute('stroke-width', '2');
+              path.setAttribute('stroke-linecap', 'round');
+              path.setAttribute('stroke-linejoin', 'round');
+              path.setAttribute('data-id', drawing.id);
+
+              this.enablePathDeletion(path, drawing.id);
+
+              svg.appendChild(path);
+            });
+          }
         } catch (e) {
           console.error('Erro ao carregar:', e);
         }
@@ -663,13 +708,28 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     private switchLayer(previousLayer: number, newLayer: number) {
       this.isSwitchingLayer = true;
 
-      const currentData = this.graph.toJSON();
+      const currentData = {
+        graph: this.graph.toJSON(),
+        drawings: this.drawings
+      };
       localStorage.setItem(
         `c4-diagram-layer-${previousLayer}`,
         JSON.stringify(currentData)
       );
 
       this.graph.clear();
+
+      this.drawings = [];
+
+      const oldPaths =
+        this.canvas.nativeElement.querySelectorAll('path');
+
+      oldPaths.forEach((p: SVGPathElement) => {
+
+        if (p.getAttribute('stroke') === '#000') {
+          p.remove();
+        }
+      });
 
       const savedData = localStorage.getItem(
         `c4-diagram-layer-${newLayer}`
@@ -678,7 +738,34 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       if (savedData) {
         try {
           const json = JSON.parse(savedData);
-          this.graph.fromJSON(json);
+          this.graph.fromJSON(json.graph || json);
+
+          if (json.drawings) {
+
+            this.drawings = json.drawings;
+
+            const svg = this.canvas.nativeElement.querySelector('svg');
+
+            this.drawings.forEach((drawing: any) => {
+
+              const path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+              );
+
+              path.setAttribute('d', drawing.path);
+              path.setAttribute('fill', 'none');
+              path.setAttribute('stroke', '#000');
+              path.setAttribute('stroke-width', '2');
+              path.setAttribute('stroke-linecap', 'round');
+              path.setAttribute('stroke-linejoin', 'round');
+              path.setAttribute('data-id', drawing.id);
+
+              this.enablePathDeletion(path, drawing.id);
+
+              svg.appendChild(path);
+            });
+          }
         } catch (e) {
           console.error('Erro ao trocar camada:', e);
         }
@@ -689,4 +776,20 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       }, 100);
     }
 
+    private drawings: {
+      id: string;
+      path: string;
+    }[] = [];
+
+    private enablePathDeletion(path: SVGPathElement, id: string) {
+    path.addEventListener('click', () => {
+      if (this.activeTool !== 'delete') return;
+
+      path.remove();
+
+      this.drawings = this.drawings.filter(d => d.id !== id);
+
+      this.saveToLocalStorage();
+    });
+  }
 }
