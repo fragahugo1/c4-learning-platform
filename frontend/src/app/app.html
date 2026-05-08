@@ -1,5 +1,8 @@
 <div style="display: flex;">
-  <app-sidebar [currentLayer]="currentLayer()"></app-sidebar>
+  <app-sidebar 
+    [currentLayer]="currentLayer()"
+    (onValidate)="executarValidacao()">
+  </app-sidebar>
   <app-board
     style="flex-grow: 1;"
     [activeTool]="activeTool"

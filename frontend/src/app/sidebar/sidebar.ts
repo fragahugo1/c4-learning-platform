@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, Output, EventEmitter } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -16,11 +16,17 @@ export class Sidebar {
   currentLayer = input<number>(1);
   sidebarVisible: boolean = false;
 
+  @Output() onValidate = new EventEmitter<void>();
+
   currentPhase = computed(() => {
     return this.miniMundoService.getPhaseByLayer(this.currentLayer());
   });
 
   constructor(private miniMundoService: MiniMundoService) {}
+
+  startEvaluation() {
+    this.onValidate.emit();
+  }
 
   onDragStart(event: DragEvent, type: string) {
     if (event.dataTransfer) {
