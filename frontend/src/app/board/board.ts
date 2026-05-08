@@ -776,6 +776,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       }, 100);
     }
 
+    exportDiagramAsJson(): string {
+      return JSON.stringify(this.graph.toJSON());
+    }
+
     private drawings: {
       id: string;
       path: string;
