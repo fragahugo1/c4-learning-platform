@@ -9,6 +9,8 @@
   background: #2c2c2c;
   padding: 10px 15px;
   border-radius: 12px;
+  z-index: 9999;      
+  pointer-events: all;  
 }
 
 .tools {
@@ -44,4 +46,10 @@ button:hover {
 
 .camada-btn:hover {
   background: #e0b837;
+}
+
+app-horizontal-bar {
+  position: relative;
+  z-index: 1000;
+  pointer-events: all;
 }

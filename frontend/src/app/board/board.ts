@@ -36,6 +36,9 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
   textY = 0;
   textValue = '';
   private isSwitchingLayer = false;
+  private isDrawing = false;
+  private currentPath: SVGPathElement | null = null;
+  private pathData = '';
 
   private lastDiagramCoords = { x: 0, y: 0 };
   private graph = new joint.dia.Graph({}, {
@@ -180,6 +183,108 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.setupDropListeners();
     window.addEventListener('resize', this.onResize);
     setTimeout(() => this.onResize(), 100);
+
+    const svg = this.canvas.nativeElement.querySelector('svg');
+
+    this.paper.on('blank:pointerdown', (_evt, x, y) => {
+      if (this.activeTool !== 'draw') return;
+
+      this.isDrawing = true;
+
+      this.pathData = `M ${x} ${y}`;
+
+      this.currentPath = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'path'
+      );
+
+      this.currentPath.setAttribute('d', this.pathData);
+      this.currentPath.setAttribute('fill', 'none');
+      this.currentPath.setAttribute('stroke', '#000');
+      this.currentPath.setAttribute('stroke-width', '2');
+      this.currentPath.setAttribute('stroke-linecap', 'round');
+      this.currentPath.setAttribute('stroke-linejoin', 'round');
+
+      svg.appendChild(this.currentPath);
+    });
+
+    let lastX = 0;
+    let lastY = 0;
+
+    this.paper.on('blank:pointerdown', (_evt, x, y) => {
+      if (this.activeTool !== 'draw') return;
+
+      this.isDrawing = true;
+
+      lastX = x;
+      lastY = y;
+
+      this.pathData = `M ${x} ${y}`;
+
+      this.currentPath = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'path'
+      );
+
+      this.currentPath.setAttribute('d', this.pathData);
+      this.currentPath.setAttribute('fill', 'none');
+      this.currentPath.setAttribute('stroke', '#000');
+      this.currentPath.setAttribute('stroke-width', '2');
+      this.currentPath.setAttribute('stroke-linecap', 'round');
+      this.currentPath.setAttribute('stroke-linejoin', 'round');
+
+      svg.appendChild(this.currentPath);
+    });
+
+    this.canvas.nativeElement.addEventListener(
+      'pointermove',
+      (evt: PointerEvent) => {
+        if (!this.isDrawing || !this.currentPath) return;
+
+        const rect = this.canvas.nativeElement.getBoundingClientRect();
+
+        const point = this.paper.clientToLocalPoint({
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        });
+
+        const midX = (lastX + point.x) / 2;
+        const midY = (lastY + point.y) / 2;
+
+        this.pathData += ` Q ${lastX} ${lastY} ${midX} ${midY}`;
+
+        this.currentPath.setAttribute('d', this.pathData);
+
+        lastX = point.x;
+        lastY = point.y;
+      }
+    );
+
+    window.addEventListener('pointerup', () => {
+      if (this.isDrawing && this.currentPath) {
+
+        const id = crypto.randomUUID();
+
+        this.currentPath.setAttribute('data-id', id);
+
+        this.drawings.push({
+          id,
+          path: this.pathData
+        });
+
+        this.enablePathDeletion(this.currentPath, id);
+
+        this.saveToLocalStorage();
+      }
+
+      this.isDrawing = false;
+      this.currentPath = null;
+    });
+
+    this.paper.on('blank:pointerup', () => {
+      this.isDrawing = false;
+      this.currentPath = null;
+    });
   }
 
   private setupDropListeners() {
@@ -550,7 +655,10 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     private saveToLocalStorage() {
-      const data = this.graph.toJSON();
+      const data = {
+        graph: this.graph.toJSON(),
+        drawings: this.drawings
+      };
       localStorage.setItem(
         `c4-diagram-layer-${this.currentLayer}`,
         JSON.stringify(data)
@@ -564,7 +672,33 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       if (savedData) {
         try {
           const json = JSON.parse(savedData);
-          this.graph.fromJSON(json);
+          this.graph.fromJSON(json.graph || json);
+          if (json.drawings) {
+
+            const svg = this.canvas.nativeElement.querySelector('svg');
+
+            this.drawings = json.drawings;
+
+            this.drawings.forEach((drawing: any) => {
+
+              const path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+              );
+
+              path.setAttribute('d', drawing.path);
+              path.setAttribute('fill', 'none');
+              path.setAttribute('stroke', '#000');
+              path.setAttribute('stroke-width', '2');
+              path.setAttribute('stroke-linecap', 'round');
+              path.setAttribute('stroke-linejoin', 'round');
+              path.setAttribute('data-id', drawing.id);
+
+              this.enablePathDeletion(path, drawing.id);
+
+              svg.appendChild(path);
+            });
+          }
         } catch (e) {
           console.error('Erro ao carregar:', e);
         }
@@ -574,13 +708,28 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
     private switchLayer(previousLayer: number, newLayer: number) {
       this.isSwitchingLayer = true;
 
-      const currentData = this.graph.toJSON();
+      const currentData = {
+        graph: this.graph.toJSON(),
+        drawings: this.drawings
+      };
       localStorage.setItem(
         `c4-diagram-layer-${previousLayer}`,
         JSON.stringify(currentData)
       );
 
       this.graph.clear();
+
+      this.drawings = [];
+
+      const oldPaths =
+        this.canvas.nativeElement.querySelectorAll('path');
+
+      oldPaths.forEach((p: SVGPathElement) => {
+
+        if (p.getAttribute('stroke') === '#000') {
+          p.remove();
+        }
+      });
 
       const savedData = localStorage.getItem(
         `c4-diagram-layer-${newLayer}`
@@ -589,7 +738,34 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
       if (savedData) {
         try {
           const json = JSON.parse(savedData);
-          this.graph.fromJSON(json);
+          this.graph.fromJSON(json.graph || json);
+
+          if (json.drawings) {
+
+            this.drawings = json.drawings;
+
+            const svg = this.canvas.nativeElement.querySelector('svg');
+
+            this.drawings.forEach((drawing: any) => {
+
+              const path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+              );
+
+              path.setAttribute('d', drawing.path);
+              path.setAttribute('fill', 'none');
+              path.setAttribute('stroke', '#000');
+              path.setAttribute('stroke-width', '2');
+              path.setAttribute('stroke-linecap', 'round');
+              path.setAttribute('stroke-linejoin', 'round');
+              path.setAttribute('data-id', drawing.id);
+
+              this.enablePathDeletion(path, drawing.id);
+
+              svg.appendChild(path);
+            });
+          }
         } catch (e) {
           console.error('Erro ao trocar camada:', e);
         }
@@ -602,5 +778,27 @@ export class BoardComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     exportDiagramAsJson(): string {
       return JSON.stringify(this.graph.toJSON());
+    }
+
+    private drawings: {
+      id: string;
+      path: string;
+    }[] = [];
+
+    private enablePathDeletion(path: SVGPathElement, id: string) {
+    path.style.pointerEvents = 'auto';
+    path.style.cursor = 'pointer';
+    path.addEventListener('pointerdown', (event) => {
+        if (this.activeTool !== 'delete') return;
+        event.stopPropagation();
+
+        path.remove();
+
+        this.drawings = this.drawings.filter(
+          d => d.id !== id
+        );
+
+        this.saveToLocalStorage();
+      });
     }
 }
